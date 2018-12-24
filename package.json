@@ -20,6 +20,7 @@
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "typeorm": "ts-node ./node_modules/.bin/typeorm",
     "typeorm:migrate": "npm run typeorm -- migration:run",
+    "typeorm:migrateAll": "npm run typeorm:migrate && NODE_ENV=test npm run typeorm:migrate",
     "typeorm:generate": "npm run typeorm -- migration:generate",
     "typeorm:create": "npm run typeorm -- migration:create",
     "typeorm:revert": "npm run typeorm -- migration:revert"
