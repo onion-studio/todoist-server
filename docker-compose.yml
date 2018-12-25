@@ -1,0 +1,25 @@
+version: '3'
+services:
+  web:
+    build: .
+    ports:
+      - "3030:3000"
+    links:
+      - db
+    environment:
+      TYPEORM_CONNECTION: mysql
+      TYPEORM_HOST: db
+      TYPEORM_USERNAME: todoist
+      TYPEORM_PASSWORD: todoist
+      TYPEORM_DATABASE: todoist
+      TYPEORM_PORT: 3306
+      TYPEORM_ENTITIES: 'src/**/**.entity.ts'
+      TYPEORM_MIGRATIONS: 'migration/**/*.ts'
+      TYPEORM_MIGRATIONS_RUN: 'true'
+  db:
+    image: mysql:5
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_USER: todoist
+      MYSQL_PASSWORD: todoist
+      MYSQL_DATABASE: todoist
