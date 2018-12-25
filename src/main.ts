@@ -8,6 +8,7 @@ async function bootstrap() {
   const options = new DocumentBuilder()
     .setTitle('Todoist clone REST API')
     .setVersion('0.1')
+    .addBearerAuth()
     .build()
   const document = SwaggerModule.createDocument(app, options)
   SwaggerModule.setup('swagger', app, document)

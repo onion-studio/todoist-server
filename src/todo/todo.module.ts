@@ -7,6 +7,5 @@ import { TodoRepository } from './todo.service'
 @Module({
   imports: [TypeOrmModule.forFeature([Todo, TodoRepository])],
   controllers: [TodoController],
-  // providers: [TodoRepository],
 })
 export class TodoModule {}
