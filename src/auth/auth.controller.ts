@@ -1,5 +1,5 @@
-import { Body, Controller, Get, Post } from '@nestjs/common'
-import { ApiUseTags, ApiOperation } from '@nestjs/swagger'
+import { Body, Controller, Post } from '@nestjs/common'
+import { ApiOperation, ApiUseTags } from '@nestjs/swagger'
 
 import { InjectRepository } from '@nestjs/typeorm'
 import { LoginPayload } from './auth.interface'
@@ -26,8 +26,8 @@ export class AuthController {
   @ApiOperation({
     title: '토큰 발급',
   })
-  @Post('signin')
-  async signin(@Body() payload: LoginPayload): Promise<string> {
+  @Post('sign_in')
+  async signIn(@Body() payload: LoginPayload): Promise<string> {
     const user = await this.userRepo.getUserFromLoginPayload(payload)
     return this.userRepo.getTokenFromUser(user)
   }
