@@ -2,7 +2,7 @@ import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common'
 import { AuthGuard } from '@nestjs/passport'
 import { ApiBearerAuth, ApiOperation, ApiUseTags } from '@nestjs/swagger'
 import { InjectRepository } from '@nestjs/typeorm'
-import Todo from './entities/Todo.entity'
+import Todo from '../entity/Todo'
 import { NewTodoPayload } from './todo.interface'
 import { TodoRepository } from './todo.service'
 

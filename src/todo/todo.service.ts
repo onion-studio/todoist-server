@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import { AbstractRepository, EntityRepository } from 'typeorm'
-import Todo from './entities/Todo.entity'
+import Todo from '../entity/Todo'
 import { NewTodoPayload } from './todo.interface'
 
 @Injectable()

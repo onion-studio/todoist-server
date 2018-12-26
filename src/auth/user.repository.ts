@@ -4,8 +4,8 @@ import { sign, verify } from 'jsonwebtoken'
 import { AbstractRepository, EntityRepository } from 'typeorm'
 import { promisify } from 'util'
 
+import User from '../entity/User'
 import { LoginPayload, TokenPayload } from './auth.interface'
-import User from './entities/User.entity'
 
 @Injectable()
 @EntityRepository(User)

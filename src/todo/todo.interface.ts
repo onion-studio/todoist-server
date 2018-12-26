@@ -1,5 +1,5 @@
 import { ApiModelProperty } from '@nestjs/swagger'
-import Todo from './entities/Todo.entity'
+import Todo from '../entity/Todo'
 
 export class NewTodoPayload implements Pick<Todo, 'title'> {
   @ApiModelProperty({

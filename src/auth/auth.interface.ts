@@ -1,4 +1,4 @@
-import User from './entities/User.entity'
+import User from '../entity/User'
 
 export class LoginPayload implements Pick<User, 'email'> {
   readonly email: string
