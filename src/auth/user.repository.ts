@@ -1,35 +1,36 @@
 import { Injectable } from '@nestjs/common'
 import { compare, hash } from 'bcrypt'
 import { sign, verify } from 'jsonwebtoken'
-import { AbstractRepository, EntityRepository } from 'typeorm'
+import { AbstractRepository, EntityManager, EntityRepository } from 'typeorm'
 import { promisify } from 'util'
 
 import User from '../entity/User'
 import { LoginPayload, TokenPayload } from './auth.interface'
 
-@Injectable()
-@EntityRepository(User)
-export class UserRepository extends AbstractRepository<User> {
+@EntityRepository()
+export class UserRepository {
+  constructor(private readonly manager: EntityManager) {}
+
   async findAll(): Promise<User[]> {
-    return this.repository.find()
+    return this.manager.find(User)
   }
 
   async findOneById(id: number): Promise<User> {
-    return this.repository.findOneOrFail(id)
+    return this.manager.findOneOrFail(User, id)
   }
 
   async insertUser(payload: LoginPayload): Promise<User> {
     // TODO: 올바른 비밀번호 양식이 아닐 때 에러
     const hashedPassword = await hash(payload.password, 10)
-    const user = this.repository.create({
+    const user = this.manager.create(User, {
       email: payload.email,
       hashedPassword,
     })
-    return this.repository.save(user)
+    return this.manager.save(user)
   }
 
   async getUserFromLoginPayload(payload: LoginPayload): Promise<User> {
-    const user = await this.repository.findOneOrFail({
+    const user = await this.manager.findOneOrFail(User, {
       email: payload.email,
     })
     // 비밀번호가 일치하면 true, 아니면 false
@@ -55,7 +56,7 @@ export class UserRepository extends AbstractRepository<User> {
       token,
       'mysecret',
     )) as TokenPayload
-    return this.repository.findOneOrFail(tokenPayload.id)
+    return this.manager.findOneOrFail(User, tokenPayload.id)
   }
 }
 

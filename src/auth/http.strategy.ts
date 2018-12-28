@@ -1,19 +1,23 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common'
+import { Inject, Injectable, UnauthorizedException } from '@nestjs/common'
 import { PassportStrategy } from '@nestjs/passport'
-import { InjectRepository } from '@nestjs/typeorm'
 import { Strategy } from 'passport-http-bearer'
+
+import { DatabaseProvider } from '../database/database.provider'
 import { UserRepository } from './user.repository'
 
 @Injectable()
 export class HttpStrategy extends PassportStrategy(Strategy) {
-  constructor(
-    @InjectRepository(UserRepository) private userRepo: UserRepository,
-  ) {
-    super()
+  @Inject()
+  private readonly databaseProvider: DatabaseProvider
+
+  get repo() {
+    return this.databaseProvider
+      .getEntityManager()
+      .getCustomRepository(UserRepository)
   }
 
   async validate(token: string) {
-    const user = await this.userRepo.getUserFromToken(token)
+    const user = await this.repo.getUserFromToken(token)
     if (!user) {
       throw new UnauthorizedException()
     }

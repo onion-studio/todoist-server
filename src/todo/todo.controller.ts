@@ -1,26 +1,31 @@
 import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common'
 import { AuthGuard } from '@nestjs/passport'
 import { ApiBearerAuth, ApiOperation, ApiUseTags } from '@nestjs/swagger'
-import { InjectRepository } from '@nestjs/typeorm'
+
+import { DatabaseProvider } from '../database/database.provider'
 import Todo from '../entity/Todo'
 import { NewTodoPayload } from './todo.interface'
-import { TodoRepository } from './todo.service'
+import { TodoRepository } from './todo.repository'
 
 @ApiUseTags('todos')
 @ApiBearerAuth()
 @Controller('todos')
 @UseGuards(AuthGuard('bearer'))
 export class TodoController {
-  constructor(
-    @InjectRepository(TodoRepository) private todoRepository: TodoRepository,
-  ) {}
+  constructor(private databaseProvider: DatabaseProvider) {}
+
+  get repo() {
+    return this.databaseProvider
+      .getEntityManager()
+      .getCustomRepository(TodoRepository)
+  }
 
   @ApiOperation({
     title: '할 일 목록 가져오기',
   })
   @Get()
   findAll() {
-    return this.todoRepository.findAll()
+    return this.repo.findAll()
   }
 
   @ApiOperation({
@@ -28,7 +33,7 @@ export class TodoController {
   })
   @Post()
   create(@Body() newTodoPayload: NewTodoPayload): Promise<Todo> {
-    return this.todoRepository.saveFromPayload(newTodoPayload)
+    return this.repo.saveFromPayload(newTodoPayload)
   }
 
   @ApiOperation({
@@ -36,6 +41,6 @@ export class TodoController {
   })
   @Get(':id')
   findById(@Param('id') id: string) {
-    return this.todoRepository.findOneById(parseInt(id, 10))
+    return this.repo.findOneById(parseInt(id, 10))
   }
 }

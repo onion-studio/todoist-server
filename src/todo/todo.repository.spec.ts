@@ -1,6 +1,6 @@
 import { Connection, createConnection, EntityManager } from 'typeorm'
 import { withTx } from '../testUtil'
-import { TodoRepository } from './todo.service'
+import { TodoRepository } from './todo.repository'
 
 let conn: Connection
 
