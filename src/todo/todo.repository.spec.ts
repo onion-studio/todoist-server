@@ -25,6 +25,18 @@ describe('TodoRepository', () => {
     )
   })
 
+  describe('findTodosByUserId', () => {
+    test(
+      'works',
+      withTx(async m => {
+        const { user1 } = await basicFixture(m)
+        const repo = m.getCustomRepository(TodoRepository)
+        const todos = await repo.findTodosByUserId(user1.id)
+        expect(todos).toHaveLength(2)
+      }),
+    )
+  })
+
   describe('saveProjectFrom', () => {
     test(
       'should return project with proper authority',

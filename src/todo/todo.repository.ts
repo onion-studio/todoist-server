@@ -9,6 +9,15 @@ import { NewProjectPayload, NewTodoPayload } from './todo.interface'
 export class TodoRepository {
   constructor(private readonly manager: EntityManager) {}
 
+  async findTodosByUserId(userId: number): Promise<Todo[]> {
+    return this.manager
+      .createQueryBuilder(Todo, 'todo')
+      .leftJoin('todo.project', 'project')
+      .leftJoin('project.authorities', 'authority')
+      .where('authority.userId = :userId', { userId })
+      .getMany()
+  }
+
   async findTodoById(id: number): Promise<Todo> {
     return this.manager.findOneOrFail(Todo, id)
   }

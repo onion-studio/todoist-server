@@ -106,7 +106,10 @@ export class TodoController {
     description: '접근할 수 없는 프로젝트',
   })
   @Get('projects/:projectId/todos')
-  async getAllTodos(@Param('projectId') projectIdStr: string, @Req() req) {
+  async getTodosByProjectId(
+    @Param('projectId') projectIdStr: string,
+    @Req() req,
+  ) {
     const projectId = parseInt(projectIdStr, 10)
     if (await this.repo.authorizeProject(req.user.id, projectId)) {
       return this.repo.findTodosByProjectId(projectId)
@@ -139,6 +142,19 @@ export class TodoController {
     } else {
       throw new ForbiddenException()
     }
+  }
+
+  @ApiOperation({
+    title: '전체 할 일 목록 가져오기',
+  })
+  @ApiResponse({
+    description: '할 일 목록',
+    status: 200,
+    type: [TodoPayload],
+  })
+  @Get('todos')
+  getAllTodos(@Req() req) {
+    return this.repo.findTodosByUserId(req.user.id)
   }
 
   @ApiOperation({
