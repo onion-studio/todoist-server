@@ -13,8 +13,8 @@ services:
       TYPEORM_PASSWORD: todoist
       TYPEORM_DATABASE: todoist
       TYPEORM_PORT: 3306
-      TYPEORM_ENTITIES: 'src/entity/*{.ts,.js}'
-      TYPEORM_MIGRATIONS: 'migration/**/*.ts'
+      TYPEORM_ENTITIES: src/entity/*.ts
+      TYPEORM_MIGRATIONS: migration/**/*.ts
       TYPEORM_MIGRATIONS_RUN: 'true'
   db:
     image: mysql:5
