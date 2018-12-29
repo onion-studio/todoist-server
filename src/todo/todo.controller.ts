@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  ForbiddenException,
   Get,
   Param,
   Post,
@@ -44,8 +45,8 @@ export class TodoController {
     title: '프로젝트 목록 가져오기',
   })
   @ApiResponse({
-    description: '프로젝트 목록',
     status: 200,
+    description: '프로젝트 목록',
     type: [ProjectPayload],
   })
   @Get('projects')
@@ -77,22 +78,41 @@ export class TodoController {
     status: 200,
     type: ProjectPayload,
   })
+  @ApiResponse({
+    status: 403,
+    description: '접근할 수 없는 프로젝트',
+  })
   @Get('projects/:projectId')
-  getProjectById(@Param('projectId') projectId: string) {
-    return this.repo.findProjectById(parseInt(projectId, 10))
+  async getProjectById(@Param('projectId') projectIdStr: string, @Req() req) {
+    const projectId = parseInt(projectIdStr, 10)
+    if (await this.repo.authorizeProject(req.user.id, projectId)) {
+      return this.repo.findProjectById(projectId)
+    } else {
+      throw new ForbiddenException()
+    }
   }
 
   @ApiOperation({
     title: '특정 프로젝트의 할 일 목록 가져오기',
+    description: 'TODO: 순서 변경, 기한, 라벨, 우선순위',
   })
   @ApiResponse({
     description: '할 일 목록',
     status: 200,
     type: [TodoPayload],
   })
+  @ApiResponse({
+    status: 403,
+    description: '접근할 수 없는 프로젝트',
+  })
   @Get('projects/:projectId/todos')
-  getAllTodos(@Param('projectId') projectId: string) {
-    return this.repo.findTodosByProjectId(parseInt(projectId, 10))
+  async getAllTodos(@Param('projectId') projectIdStr: string, @Req() req) {
+    const projectId = parseInt(projectIdStr, 10)
+    if (await this.repo.authorizeProject(req.user.id, projectId)) {
+      return this.repo.findTodosByProjectId(projectId)
+    } else {
+      throw new ForbiddenException()
+    }
   }
 
   @ApiOperation({
@@ -103,12 +123,22 @@ export class TodoController {
     status: 200,
     type: TodoPayload,
   })
+  @ApiResponse({
+    status: 403,
+    description: '접근할 수 없는 프로젝트',
+  })
   @Post('projects/:projectId/todos')
-  createTodo(
-    @Param('projectId') projectId: string,
+  async createTodo(
+    @Param('projectId') projectIdStr: string,
     @Body() newTodoPayload: NewTodoPayload,
+    @Req() req,
   ): Promise<Todo> {
-    return this.repo.saveTodoFrom(newTodoPayload, parseInt(projectId, 10))
+    const projectId = parseInt(projectIdStr, 10)
+    if (await this.repo.authorizeProject(req.user.id, projectId)) {
+      return this.repo.saveTodoFrom(newTodoPayload, projectId)
+    } else {
+      throw new ForbiddenException()
+    }
   }
 
   @ApiOperation({
@@ -119,8 +149,18 @@ export class TodoController {
     status: 200,
     type: TodoPayload,
   })
+  @ApiResponse({
+    status: 403,
+    description: '접근할 수 없는 할 일',
+  })
   @Get('todos/:todoId')
-  getTodoById(@Param('todoId') todoId: string) {
-    return this.repo.findTodoById(parseInt(todoId, 10))
+  getTodoById(@Param('todoId') todoIdStr: string, @Req() req) {
+    const todoId = parseInt(todoIdStr, 10)
+    if (this.repo.authorizeTodo(req.user.id, todoId)) {
+      return this.repo.findTodoById(todoId)
+    } else {
+      // TODO: ForbiddenException 테스트
+      throw new ForbiddenException()
+    }
   }
 }

@@ -1,7 +1,7 @@
 import { EntityManager, EntityRepository } from 'typeorm'
 
 import Project from '../entity/Project'
-import ProjectAuthority from '../entity/ProjectAuthority'
+import ProjectAuthority, { ProjectPermission } from '../entity/ProjectAuthority'
 import Todo from '../entity/Todo'
 import { NewProjectPayload, NewTodoPayload } from './todo.interface'
 
@@ -54,5 +54,28 @@ export class TodoRepository {
     })
     await this.manager.save(authority)
     return p
+  }
+
+  async authorizeTodo(
+    userId: number,
+    todoId: number,
+  ): Promise<ProjectPermission | false> {
+    const project = await this.manager
+      .createQueryBuilder(Project, 'project')
+      .leftJoin('project.todos', 'todo')
+      .where('todo.id = :todoId', { todoId })
+      .getOne()
+    return this.authorizeProject(userId, project.id)
+  }
+
+  async authorizeProject(
+    userId: number,
+    projectId: number,
+  ): Promise<ProjectPermission | false> {
+    const authority = await this.manager.findOne(ProjectAuthority, {
+      userId,
+      projectId,
+    })
+    return authority ? authority.permission : false
   }
 }
