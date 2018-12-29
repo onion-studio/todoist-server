@@ -14,18 +14,18 @@ afterAll(async () => {
 })
 
 describe('UserRepository', () => {
-  describe('insertUser', () => {
+  describe('saveUserFrom', () => {
     test(
       'should insert user with proper email/password',
       withTx(async m => {
         const repo = m.getCustomRepository(UserRepository)
-        expect(await repo.findAll()).toHaveLength(0)
-        const user = await repo.insertUser({
+        expect(await repo.findAllUsers()).toHaveLength(0)
+        const user = await repo.saveUserFrom({
           email: 'myusername',
           password: 'mypassword',
         })
         expect(user.email).toBe('myusername')
-        expect(await repo.findAll()).toHaveLength(1)
+        expect(await repo.findAllUsers()).toHaveLength(1)
       }),
     )
 
@@ -68,14 +68,14 @@ describe('UserRepository', () => {
     )
   })
 
-  describe('getUserFromLoginPayload', () => {
+  describe('getUserFrom', () => {
     test(
       'should return user from proper payload',
       withTx(async m => {
         const { user1 } = await basicFixture(m)
         const repo = m.getCustomRepository(UserRepository)
 
-        const returned = await repo.getUserFromLoginPayload({
+        const returned = await repo.getUserFrom({
           email: 'myusername',
           password: 'mypassword',
         })
@@ -90,7 +90,7 @@ describe('UserRepository', () => {
         const { user1 } = await basicFixture(m)
         const repo = m.getCustomRepository(UserRepository)
         return expect(
-          repo.getUserFromLoginPayload({
+          repo.getUserFrom({
             email: 'myusername',
             password: 'INVALID_PASSWORD',
           }),
@@ -102,7 +102,7 @@ describe('UserRepository', () => {
 
 async function basicFixture(m: EntityManager) {
   const repo = m.getCustomRepository(UserRepository)
-  const user1 = await repo.insertUser({
+  const user1 = await repo.saveUserFrom({
     email: 'myusername',
     password: 'mypassword',
   })

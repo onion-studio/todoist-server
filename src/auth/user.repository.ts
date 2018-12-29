@@ -11,7 +11,7 @@ import { LoginPayload, TokenPayload } from './auth.interface'
 export class UserRepository {
   constructor(private readonly manager: EntityManager) {}
 
-  async findAll(): Promise<User[]> {
+  async findAllUsers(): Promise<User[]> {
     return this.manager.find(User)
   }
 
@@ -19,7 +19,7 @@ export class UserRepository {
     return this.manager.findOneOrFail(User, id)
   }
 
-  async insertUser(payload: LoginPayload): Promise<User> {
+  async saveUserFrom(payload: LoginPayload): Promise<User> {
     // TODO: 올바른 비밀번호 양식이 아닐 때 에러
     const hashedPassword = await hash(payload.password, 10)
     const user = this.manager.create(User, {
@@ -29,7 +29,7 @@ export class UserRepository {
     return this.manager.save(user)
   }
 
-  async getUserFromLoginPayload(payload: LoginPayload): Promise<User> {
+  async getUserFrom(payload: LoginPayload): Promise<User> {
     const user = await this.manager.findOneOrFail(User, {
       email: payload.email,
     })

@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm'
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm'
+import ProjectAuthority from './ProjectAuthority'
 
 @Entity()
 export default class User {
@@ -18,4 +19,7 @@ export default class User {
 
   @Column()
   hashedPassword: string
+
+  @OneToMany(type => ProjectAuthority, pa => pa.user)
+  authorities: ProjectAuthority[]
 }

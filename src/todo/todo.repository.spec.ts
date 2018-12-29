@@ -1,5 +1,5 @@
-import { Connection, createConnection, EntityManager } from 'typeorm'
-import { withTx } from '../testUtil'
+import { Connection, createConnection } from 'typeorm'
+import { basicFixture, withTx } from '../testUtil'
 import { TodoRepository } from './todo.repository'
 
 let conn: Connection
@@ -13,38 +13,31 @@ afterAll(async () => {
 })
 
 describe('TodoRepository', () => {
-  describe('findAll', () => {
-    test(
-      'should return nothing with fresh database',
-      withTx(async m => {
-        const repo = m.getCustomRepository(TodoRepository)
-        const todos = await repo.findAll()
-        expect(todos).toHaveLength(0)
-      }),
-    )
-
+  describe('findTodosByProjectId', () => {
     test(
       'should return two todos with basic fixture',
       withTx(async m => {
         const repo = m.getCustomRepository(TodoRepository)
-        await basicFixture(m)
-        const todos = await repo.findAll()
+        const { project1 } = await basicFixture(m)
+        const todos = await repo.findTodosByProjectId(project1.id)
         expect(todos).toHaveLength(2)
       }),
     )
   })
-})
 
-async function basicFixture(m: EntityManager) {
-  const repo = m.getCustomRepository(TodoRepository)
-  const todo1 = await repo.saveFromPayload({
-    title: 'todo1',
+  describe('saveProjectFrom', () => {
+    test(
+      'should return project with proper authority',
+      withTx(async m => {
+        const { user1, project1 } = await basicFixture(m)
+
+        const repo = m.getCustomRepository(TodoRepository)
+        // NOTE: basicFixture에서 saveProjectFrom이 사용되고 있음
+
+        const projects = await repo.findProjectsByUserId(user1.id)
+        expect(projects).toHaveLength(1)
+        expect(projects[0].id).toBe(project1.id)
+      }),
+    )
   })
-  const todo2 = await repo.saveFromPayload({
-    title: 'todo2',
-  })
-  return {
-    todo1,
-    todo2,
-  }
-}
+})
