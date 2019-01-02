@@ -3,7 +3,7 @@ import { ApiOperation, ApiResponse, ApiUseTags } from '@nestjs/swagger'
 
 import { DatabaseProvider } from '../database/database.provider'
 import { LoginPayload } from './auth.interface'
-import { UserRepository } from './user.repository'
+import { AuthRepository } from './auth.repository'
 
 @ApiUseTags('auth')
 @Controller('auth')
@@ -13,7 +13,7 @@ export class AuthController {
   get repo() {
     return this.databaseProvider
       .getEntityManager()
-      .getCustomRepository(UserRepository)
+      .getCustomRepository(AuthRepository)
   }
 
   @ApiOperation({

@@ -3,7 +3,7 @@ import { PassportStrategy } from '@nestjs/passport'
 import { Strategy } from 'passport-http-bearer'
 
 import { DatabaseProvider } from '../database/database.provider'
-import { UserRepository } from './user.repository'
+import { AuthRepository } from './auth.repository'
 
 @Injectable()
 export class HttpStrategy extends PassportStrategy(Strategy) {
@@ -13,7 +13,7 @@ export class HttpStrategy extends PassportStrategy(Strategy) {
   get repo() {
     return this.databaseProvider
       .getEntityManager()
-      .getCustomRepository(UserRepository)
+      .getCustomRepository(AuthRepository)
   }
 
   async validate(token: string) {

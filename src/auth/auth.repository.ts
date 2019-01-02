@@ -8,7 +8,7 @@ import User from '../entity/User'
 import { LoginPayload, TokenPayload } from './auth.interface'
 
 @EntityRepository()
-export class UserRepository {
+export class AuthRepository {
   constructor(private readonly manager: EntityManager) {}
 
   async findAllUsers(): Promise<User[]> {

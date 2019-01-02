@@ -1,7 +1,8 @@
 import { JsonWebTokenError } from 'jsonwebtoken'
 import { Connection, createConnection, EntityManager } from 'typeorm'
+
 import { withTx } from '../testUtil'
-import { UserRepository } from './user.repository'
+import { AuthRepository } from './auth.repository'
 
 let conn: Connection
 
@@ -13,12 +14,12 @@ afterAll(async () => {
   await conn.close()
 })
 
-describe('UserRepository', () => {
+describe('AuthRepository', () => {
   describe('saveUserFrom', () => {
     test(
       'should insert user with proper email/password',
       withTx(async m => {
-        const repo = m.getCustomRepository(UserRepository)
+        const repo = m.getCustomRepository(AuthRepository)
         expect(await repo.findAllUsers()).toHaveLength(0)
         const user = await repo.saveUserFrom({
           email: 'myusername',
@@ -37,7 +38,7 @@ describe('UserRepository', () => {
       'should generate token from existing user',
       withTx(async m => {
         const { user1 } = await basicFixture(m)
-        const repo = m.getCustomRepository(UserRepository)
+        const repo = m.getCustomRepository(AuthRepository)
         const token = await repo.getTokenFromUser(user1)
         expect(typeof token).toBe('string')
       }),
@@ -49,7 +50,7 @@ describe('UserRepository', () => {
       'should return user from valid token',
       withTx(async m => {
         const { user1 } = await basicFixture(m)
-        const repo = m.getCustomRepository(UserRepository)
+        const repo = m.getCustomRepository(AuthRepository)
         const token = await repo.getTokenFromUser(user1)
 
         const returned = await repo.getUserFromToken(token)
@@ -60,7 +61,7 @@ describe('UserRepository', () => {
     test(
       'should throw error if invalid token is given',
       withTx(async m => {
-        const repo = m.getCustomRepository(UserRepository)
+        const repo = m.getCustomRepository(AuthRepository)
         return expect(repo.getUserFromToken('INVALID_TOKEN')).rejects.toThrow(
           JsonWebTokenError, // 'jwt malformed'
         )
@@ -73,7 +74,7 @@ describe('UserRepository', () => {
       'should return user from proper payload',
       withTx(async m => {
         const { user1 } = await basicFixture(m)
-        const repo = m.getCustomRepository(UserRepository)
+        const repo = m.getCustomRepository(AuthRepository)
 
         const returned = await repo.getUserFrom({
           email: 'myusername',
@@ -88,7 +89,7 @@ describe('UserRepository', () => {
       'should throw error with invalid password',
       withTx(async m => {
         const { user1 } = await basicFixture(m)
-        const repo = m.getCustomRepository(UserRepository)
+        const repo = m.getCustomRepository(AuthRepository)
         return expect(
           repo.getUserFrom({
             email: 'myusername',
@@ -101,7 +102,7 @@ describe('UserRepository', () => {
 })
 
 async function basicFixture(m: EntityManager) {
-  const repo = m.getCustomRepository(UserRepository)
+  const repo = m.getCustomRepository(AuthRepository)
   const user1 = await repo.saveUserFrom({
     email: 'myusername',
     password: 'mypassword',

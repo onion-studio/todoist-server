@@ -1,6 +1,6 @@
 import { EntityManager, getConnection } from 'typeorm'
 
-import { UserRepository } from './auth/user.repository'
+import { AuthRepository } from './auth/auth.repository'
 import { TodoRepository } from './todo/todo.repository'
 
 export const withTx = (f: (manager: EntityManager) => Promise<any>) => {
@@ -19,7 +19,7 @@ export const withTx = (f: (manager: EntityManager) => Promise<any>) => {
 }
 
 export async function basicFixture(m: EntityManager) {
-  const userRepo = m.getCustomRepository(UserRepository)
+  const userRepo = m.getCustomRepository(AuthRepository)
   const todoRepo = m.getCustomRepository(TodoRepository)
   const user1 = await userRepo.saveUserFrom({
     email: 'user1@example.com',
