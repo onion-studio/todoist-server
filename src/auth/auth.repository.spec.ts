@@ -1,5 +1,6 @@
 import { JsonWebTokenError } from 'jsonwebtoken'
 import { Connection, createConnection, EntityManager } from 'typeorm'
+import Project from '../entity/Project'
 
 import { withTx } from '../testUtil'
 import { AuthRepository } from './auth.repository'
@@ -31,6 +32,29 @@ describe('AuthRepository', () => {
     )
 
     test.skip('should throw error if a user with the same email exists', () => {})
+
+    test(
+      'should insert user with initial projects',
+      withTx(async m => {
+        const repo = m.getCustomRepository(AuthRepository)
+        const user = await repo.saveUserFrom({
+          email: 'myusername',
+          password: 'mypassword'
+        }, true)
+
+        const authedProjects = await m.createQueryBuilder(Project, 'project')
+          .leftJoinAndSelect('project.todos', 'todo')
+          .leftJoin('project.authorities', 'authority')
+          .where({
+            userId: user.id
+          })
+          .getMany()
+
+        expect(authedProjects).toHaveLength(2)
+        expect(authedProjects[1].title).toMatch('환영합니다')
+        expect(authedProjects[1].todos).toHaveLength(9)
+      })
+    )
   })
 
   describe('getTokenFromUser', () => {
@@ -88,7 +112,7 @@ describe('AuthRepository', () => {
     test(
       'should throw error with invalid password',
       withTx(async m => {
-        const { user1 } = await basicFixture(m)
+        await basicFixture(m)
         const repo = m.getCustomRepository(AuthRepository)
         return expect(
           repo.getUserFrom({
