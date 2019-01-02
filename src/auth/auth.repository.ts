@@ -3,7 +3,8 @@ import { compare, hash } from 'bcrypt'
 import { sign, verify } from 'jsonwebtoken'
 import { AbstractRepository, EntityManager, EntityRepository } from 'typeorm'
 import { promisify } from 'util'
-
+import Project from '../entity/Project'
+import ProjectAuthority, { ProjectPermission } from '../entity/ProjectAuthority'
 import User from '../entity/User'
 import { LoginPayload, TokenPayload } from './auth.interface'
 
@@ -19,14 +20,38 @@ export class AuthRepository {
     return this.manager.findOneOrFail(User, id)
   }
 
-  async saveUserFrom(payload: LoginPayload): Promise<User> {
+  async saveUserFrom(payload: LoginPayload, initialize = false): Promise<User> {
     // TODO: 올바른 비밀번호 양식이 아닐 때 에러
     const hashedPassword = await hash(payload.password, 10)
+
+    const saveArr = []
     const user = this.manager.create(User, {
       email: payload.email,
       hashedPassword,
     })
-    return this.manager.save(user)
+    saveArr.push(user)
+    if (initialize) {
+      const inbox = this.manager.create(Project, {
+        title: 'Inbox',
+      })
+      const inboxAuth = this.manager.create(ProjectAuthority, {
+        permission: ProjectPermission.Owner,
+        user,
+        project: inbox,
+      })
+
+      const welcome = this.manager.create(Project, {
+        title: 'Welcome',
+      })
+      const welcomeAuth = this.manager.create(ProjectAuthority, {
+        permission: ProjectPermission.Owner,
+        user,
+        project: welcome,
+      })
+      saveArr.push(inbox, inboxAuth, welcome, welcomeAuth)
+    }
+    const [savedUser] = await this.manager.save(saveArr)
+    return savedUser
   }
 
   async getUserFrom(payload: LoginPayload): Promise<User> {

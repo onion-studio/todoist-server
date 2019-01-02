@@ -1,5 +1,4 @@
 import { ApiModelProperty } from '@nestjs/swagger'
-
 import User from '../entity/User'
 
 export class LoginPayload implements Pick<User, 'email'> {
