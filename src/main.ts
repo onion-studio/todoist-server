@@ -1,8 +1,10 @@
 import { NestFactory } from '@nestjs/core'
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger'
 import { AppModule } from './app.module'
+import { createDefaultConnection } from './connection'
 
 async function bootstrap() {
+  const conn = await createDefaultConnection()
   const app = await NestFactory.create(AppModule)
 
   const options = new DocumentBuilder()

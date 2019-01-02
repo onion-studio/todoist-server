@@ -1,5 +1,6 @@
 import { JsonWebTokenError } from 'jsonwebtoken'
-import { Connection, createConnection, EntityManager } from 'typeorm'
+import { Connection, EntityManager } from 'typeorm'
+import { createDefaultConnection } from '../connection'
 import Project from '../entity/Project'
 
 import { withTx } from '../testUtil'
@@ -8,7 +9,7 @@ import { AuthRepository } from './auth.repository'
 let conn: Connection
 
 beforeAll(async () => {
-  conn = await createConnection()
+  conn = await createDefaultConnection()
 })
 
 afterAll(async () => {
