@@ -28,7 +28,7 @@ export class AuthController {
   async register(@Body() payload: LoginPayload): Promise<string> {
     // FIXME: LoginPayload 노노
     // TODO: Recaptcha
-    const user = await this.repo.saveUserFrom(payload)
+    const user = await this.repo.saveUserFrom(payload, true)
     return this.repo.getTokenFromUser(user)
   }
 
