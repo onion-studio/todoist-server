@@ -3,7 +3,11 @@ import { EntityManager, EntityRepository } from 'typeorm'
 import Project from '../entity/Project'
 import ProjectAuthority, { ProjectPermission } from '../entity/ProjectAuthority'
 import Todo from '../entity/Todo'
-import { NewProjectPayload, NewTodoPayload } from './todo.interface'
+import {
+  NewProjectPayload,
+  NewTodoPayload,
+  UpdateTodosOrderItem,
+} from './todo.interface'
 
 @EntityRepository()
 export class TodoRepository {
@@ -32,10 +36,25 @@ export class TodoRepository {
     payload: NewTodoPayload,
     projectId: number,
   ): Promise<Todo> {
-    const project = await this.manager.findOneOrFail(Project, projectId)
-    const newTodo = this.manager.create(Todo, payload)
-    newTodo.projectId = project.id
-    return this.manager.save(newTodo)
+    await this.manager.findOneOrFail(Project, projectId)
+
+    // https://www.lesstif.com/display/DBMS/MySQL+Error+1093+%3A+You+can%27t+specify+target+table+%27cwd_group%27+for+update+in+FROM+clause
+    const insertQuery = this.manager
+      .createQueryBuilder()
+      .insert()
+      .into(Todo)
+      .values({
+        ...payload,
+        projectId,
+        order: () =>
+          `(SELECT COALESCE(MAX(t.order), 0) maxOrder FROM todo t WHERE t.projectId = :projectId) + 1`,
+      })
+      .setParameters({ projectId })
+    // const rawSql = insertQuery.getQuery()
+    const {
+      identifiers: [todoId],
+    } = await insertQuery.execute()
+    return this.manager.findOneOrFail(Todo, todoId)
   }
 
   async findProjectById(id: number): Promise<Project> {
@@ -86,5 +105,17 @@ export class TodoRepository {
       projectId,
     })
     return authority ? authority.permission : false
+  }
+
+  async updateTodosOrderFrom(
+    todos: Todo[],
+    todosOrderList: UpdateTodosOrderItem[],
+  ): Promise<Todo[]> {
+    todosOrderList.forEach(to => {
+      const todo = todos.find(t => t.id === to.id)
+      // 반드시 찾았다고 가정
+      todo!!.order = to.order
+    })
+    return this.manager.save(todos)
   }
 }

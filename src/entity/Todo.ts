@@ -22,6 +22,9 @@ export default class Todo {
   @Column()
   projectId: number
 
+  @Column()
+  order: number
+
   @ManyToOne(type => Todo, todo => todo.children)
   @JoinColumn({ name: 'parentId' })
   parent: Todo

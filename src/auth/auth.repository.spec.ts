@@ -3,6 +3,7 @@ import { Connection, createConnection, EntityManager } from 'typeorm'
 import Project from '../entity/Project'
 
 import { withTx } from '../testUtil'
+import { TodoRepository } from '../todo/todo.repository'
 import { AuthRepository } from './auth.repository'
 
 let conn: Connection
@@ -37,23 +38,23 @@ describe('AuthRepository', () => {
       'should insert user with initial projects',
       withTx(async m => {
         const repo = m.getCustomRepository(AuthRepository)
-        const user = await repo.saveUserFrom({
-          email: 'myusername',
-          password: 'mypassword'
-        }, true)
+        const todoRepo = m.getCustomRepository(TodoRepository)
+        const user = await repo.saveUserFrom(
+          {
+            email: 'myusername',
+            password: 'mypassword',
+          },
+          true,
+        )
 
-        const authedProjects = await m.createQueryBuilder(Project, 'project')
-          .leftJoinAndSelect('project.todos', 'todo')
-          .leftJoin('project.authorities', 'authority')
-          .where({
-            userId: user.id
-          })
-          .getMany()
+        const authedProjects = await todoRepo.findProjectsByUserId(user.id)
 
         expect(authedProjects).toHaveLength(2)
         expect(authedProjects[1].title).toMatch('환영합니다')
-        expect(authedProjects[1].todos).toHaveLength(9)
-      })
+
+        const todos = await todoRepo.findTodosByProjectId(authedProjects[1].id)
+        expect(todos).toHaveLength(9)
+      }),
     )
   })
 

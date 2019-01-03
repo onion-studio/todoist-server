@@ -43,10 +43,41 @@ export async function basicFixture(m: EntityManager) {
     },
     project1.id,
   )
+
+  const user2 = await userRepo.saveUserFrom({
+    email: 'user2@example.com',
+    password: 'mypassword',
+  })
+
+  const project2 = await todoRepo.saveProjectFrom(
+    {
+      title: 'project2',
+    },
+    user2.id,
+  )
+
+  const todo3 = await todoRepo.saveTodoFrom(
+    {
+      title: 'todo3',
+    },
+    project2.id,
+  )
+
+  const todo4 = await todoRepo.saveTodoFrom(
+    {
+      title: 'todo4',
+    },
+    project2.id,
+  )
+
   return {
     user1,
     project1,
     todo1,
     todo2,
+    user2,
+    project2,
+    todo3,
+    todo4,
   }
 }

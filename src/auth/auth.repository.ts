@@ -31,7 +31,6 @@ export class AuthRepository {
       hashedPassword,
     })
     await m.save(user)
-    expect(user.id).not.toBeUndefined()
 
     if (initialize) {
       const inbox = m.create(Project, {
@@ -54,46 +53,58 @@ export class AuthRepository {
       })
       await m.save([inboxAuth, welcomeAuth])
 
+      // FIXME: TodoRepository 사용하도록
       const todos = await m.save([
         m.create(Todo, {
           title: 'Todoist에 오신걸 환영합니다 👋 몇 가지 팁과 함께 시작하세요:',
-          project: welcome
+          project: welcome,
+          order: 1,
         }),
         m.create(Todo, {
           title: '새 작업을 생성하세요 ➕',
-          project: welcome
+          project: welcome,
+          order: 2,
         }),
         m.create(Todo, {
           title: '이 작업의 일정을 정하세요 📅',
-          project: welcome
+          project: welcome,
+          order: 3,
+        }),
+        m.create(Todo, {
+          title: '드래그 및 들여쓰기하여 하위 작업을 만드세요 ✅',
+          project: welcome,
+          order: 4,
         }),
         m.create(Todo, {
           title: '당신의 프로젝트를 생성하세요 🗒',
-          project: welcome
+          project: welcome,
+          order: 5,
         }),
         m.create(Todo, {
-          title: '[템플릿과 함께 프로젝트 시작하기 →](https://todoist.com/templates)',
-          project: welcome
+          title:
+            '[템플릿과 함께 프로젝트 시작하기 →](https://todoist.com/templates)',
+          project: welcome,
+          order: 6,
         }),
         m.create(Todo, {
-          title: '[가이드와 함께 Todoist 이용 방법 알아보기 →](https://todoist.com/guide/getting-started)',
-          project: welcome
+          title:
+            '[가이드와 함께 Todoist 이용 방법 알아보기 →](https://todoist.com/guide/getting-started)',
+          project: welcome,
+          order: 7,
         }),
         m.create(Todo, {
-          title: '[앱과 함께 어디에서나 체계적으로 일하기 →](https://todoist.com/downloads?focus=desktop)',
-          project: welcome
+          title:
+            '[앱과 함께 어디에서나 체계적으로 일하기 →](https://todoist.com/downloads?focus=desktop)',
+          project: welcome,
+          order: 8,
         }),
         m.create(Todo, {
-          title: '[문의사항이 있습니까? 팁이 필요합니까? 도움말 센터를 방문하세요 →](https:// get.todoist.help)',
-          project: welcome
+          title:
+            '[문의사항이 있습니까? 팁이 필요합니까? 도움말 센터를 방문하세요 →](https:// get.todoist.help)',
+          project: welcome,
+          order: 9,
         }),
       ])
-
-      await m.save(m.create(Todo, {
-        title: '드래그 및 들여쓰기하여 하위 작업을 만드세요 ✅',
-        project: welcome,
-        parent: todos[2]
-      }))
     }
 
     return user

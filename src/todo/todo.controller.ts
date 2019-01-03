@@ -4,6 +4,7 @@ import {
   ForbiddenException,
   Get,
   Param,
+  Patch,
   Post,
   Req,
   UseGuards,
@@ -25,6 +26,7 @@ import {
   NewTodoPayload,
   ProjectPayload,
   TodoPayload,
+  UpdateTodosOrderPayload,
 } from './todo.interface'
 import { TodoRepository } from './todo.repository'
 
@@ -94,7 +96,7 @@ export class TodoController {
 
   @ApiOperation({
     title: '특정 프로젝트의 할 일 목록 가져오기',
-    description: 'TODO: 순서 변경, 기한, 라벨, 우선순위',
+    description: 'TODO: 기한, 라벨, 우선순위',
   })
   @ApiResponse({
     description: '할 일 목록',
@@ -116,6 +118,36 @@ export class TodoController {
     } else {
       throw new ForbiddenException()
     }
+  }
+
+  @ApiOperation({
+    title: '특정 프로젝트의 할 일 순서 변경하기',
+  })
+  @ApiResponse({
+    description: '할 일 목록',
+    status: 200,
+    type: [TodoPayload],
+  })
+  @ApiResponse({
+    status: 403,
+    description: '접근할 수 없는 프로젝트',
+  })
+  @Patch('projects/:projectId/todosOrder')
+  async updateTodosOrderByProjectId(
+    @Param('projectId') projectIdStr: string,
+    @Body() payload: UpdateTodosOrderPayload,
+    @Req() req,
+  ) {
+    const projectId = parseInt(projectIdStr, 10)
+    if (!(await this.repo.authorizeProject(req.user.id, projectId))) {
+      throw new ForbiddenException()
+    }
+    const todos = await this.repo.findTodosByProjectId(projectId)
+    const idSet = new Set(todos.map(t => t.id))
+    if (!todos.every(t => idSet.has(t.id))) {
+      throw new ForbiddenException()
+    }
+    return this.repo.updateTodosOrderFrom(todos, payload.orderList)
   }
 
   @ApiOperation({
