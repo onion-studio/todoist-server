@@ -1,10 +1,10 @@
 import { NestFactory } from '@nestjs/core'
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger'
+import { createConnection } from 'typeorm'
 import { AppModule } from './app.module'
-import { createDefaultConnection } from './connection'
 
 async function bootstrap() {
-  const conn = await createDefaultConnection()
+  const conn = await createConnection()
   const app = await NestFactory.create(AppModule)
 
   const options = new DocumentBuilder()

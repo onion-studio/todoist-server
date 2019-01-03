@@ -1,12 +1,11 @@
-import { Connection } from 'typeorm'
-import { createDefaultConnection } from '../connection'
+import { Connection, createConnection } from 'typeorm'
 import { basicFixture, withTx } from '../testUtil'
 import { TodoRepository } from './todo.repository'
 
 let conn: Connection
 
 beforeAll(async () => {
-  conn = await createDefaultConnection()
+  conn = await createConnection()
 })
 
 afterAll(async () => {

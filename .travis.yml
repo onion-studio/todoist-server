@@ -1,13 +1,20 @@
-language: generic
+# https://github.com/typeorm/typeorm/blob/master/.travis.yml
+
+dist: xenial # MySQL 5.7
+language: node_js
+node_js:
+  - 8
 services:
-- docker
-jobs:
-  include:
-  - stage: test
-    script:
-    - docker-compose up -d
-    - sleep 10
-    - docker-compose exec web npm run test
+  - mysql
+before_install:
+  - "mysql -e 'CREATE DATABASE IF NOT EXISTS todoist CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;' -uroot"
+before_script:
+  - cp travis.ormconfig.json ormconfig.json
+  - npx ts-node scripts/connectionTest.ts
+script:
+  - npm run lint
+  - npm test
+cache: npm
 notifications:
   slack:
     secure: s3ElgvuShQiSJhU1eY6Tmi7pFVruZ6XKZiWZFH0oLOjBQPFrKfCR/2vELv6TU08nKrBdHTE5i3eWPIHl08gG3ajTxn46YmUh4Q3xghu9nk9B6YrcHOrd9Xm9L5kwnmbBGy0BFwozBUprSpcS430zEj29I3V94S7WVb/vi9/lA5lDWX6Q/y331ZbXKhbbNBhFNQtUzE9y4fRoH4r8pUzqZgkmKDgBknQdwv5LLjralOQodo6qEx3DhCuWKPoyRFinNWe36mE6q0CHPi5O0/WcYMrPgvaV7GGfz/MY8Zsom7ShvmTP5WMnmX2kF3SgE98J48SGJiVmu5SpdWzK33KwlySGtQw9yNStKj3esPs1+5A0E6GBJZvPtC/sDjINTg98j1azuKfrAWUG/MHtTqvB294hbg5NbiXFEdVutdMXT6H5geugX9Mb25BnVSMY75wP9I4+10JXlwb3aq826J1eZvynQ0bTKy0bTPJDrPaGs2H7unrVdBFa4FBjMyaq4NmOVYh3aYf/ZtH3QqPkmWaGjmCikPCDNWYnWXsxN3JOxY67kaVskErVySU6YZioP2vkYqnqE/76NkwWNmvm1QSXDObYTnoYVeOoB3IyXKqI6DSyiFljOUdrOKe7hCvj21/hX9NNR0SuLq18gONXAwNrDuFaTozXw1R7VHk7arwdYvs=
