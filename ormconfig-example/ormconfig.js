@@ -5,6 +5,12 @@ let config = {
   username: 'todoist',
   password: 'todoist',
   database: 'todoist',
+  entities: ['src/entity/*.ts'],
+  migrations: ['migration/**/*.ts'],
+  charset: 'utf8mb4',
+  cli: {
+    migrationsDir: 'migration',
+  },
 }
 
 if (process.env.NODE_ENV === 'test') {
