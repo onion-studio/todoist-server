@@ -47,6 +47,31 @@ describe('TodoRepository', () => {
         expect(todos).toHaveLength(2)
       }),
     )
+
+    test(
+      'should return todos in order',
+      withTx(async m => {
+        const { project1, todo1, todo2 } = await basicFixture(m)
+        const repo = m.getCustomRepository(TodoRepository)
+        await repo.updateTodosOrderFrom(
+          [todo1, todo2],
+          [
+            {
+              id: todo1.id,
+              order: 2,
+            },
+            {
+              id: todo2.id,
+              order: 1,
+            },
+          ],
+        )
+        const todos = await repo.findTodosByProjectId(project1.id)
+        expect(todos).toHaveLength(2)
+        expect(todos[0].id).toBe(todo2.id)
+        expect(todos[1].id).toBe(todo1.id)
+      }),
+    )
   })
 
   describe('findTodosByUserId', () => {

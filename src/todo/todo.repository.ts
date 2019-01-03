@@ -27,9 +27,11 @@ export class TodoRepository {
   }
 
   async findTodosByProjectId(projectId: number): Promise<Todo[]> {
-    return this.manager.find(Todo, {
-      projectId,
-    })
+    return this.manager
+      .createQueryBuilder(Todo, 'todo')
+      .where({ projectId })
+      .orderBy('todo.order', 'ASC')
+      .getMany()
   }
 
   async saveTodoFrom(
