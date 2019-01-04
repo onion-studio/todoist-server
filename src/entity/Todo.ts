@@ -25,6 +25,11 @@ export default class Todo {
   @Column()
   order: number
 
+  @Column({
+    default: false,
+  })
+  complete: boolean
+
   @ManyToOne(type => Todo, todo => todo.children)
   @JoinColumn({ name: 'parentId' })
   parent: Todo
