@@ -6,6 +6,8 @@ import Todo from '../entity/Todo'
 import {
   NewProjectPayload,
   NewTodoPayload,
+  UpdateProjectPayload,
+  UpdateTodoPayload,
   UpdateTodosOrderItem,
 } from './todo.interface'
 
@@ -119,5 +121,23 @@ export class TodoRepository {
       todo!!.order = to.order
     })
     return this.manager.save(todos)
+  }
+
+  async updateTodoFrom(
+    payload: UpdateTodoPayload,
+    todoId: number,
+  ): Promise<Todo> {
+    const todo = await this.manager.findOneOrFail(Todo, todoId)
+    this.manager.merge(Todo, todo, payload)
+    return this.manager.save(todo)
+  }
+
+  async updateProjectFrom(
+    payload: UpdateProjectPayload,
+    projectId: number,
+  ): Promise<Project> {
+    const project = await this.manager.findOneOrFail(Project, projectId)
+    this.manager.merge(Project, project, payload)
+    return this.manager.save(project)
   }
 }

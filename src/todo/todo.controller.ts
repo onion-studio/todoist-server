@@ -26,6 +26,8 @@ import {
   NewTodoPayload,
   ProjectPayload,
   TodoPayload,
+  UpdateProjectPayload,
+  UpdateTodoPayload,
   UpdateTodosOrderPayload,
 } from './todo.interface'
 import { TodoRepository } from './todo.repository'
@@ -89,6 +91,32 @@ export class TodoController {
     const projectId = parseInt(projectIdStr, 10)
     if (await this.repo.authorizeProject(req.user.id, projectId)) {
       return this.repo.findProjectById(projectId)
+    } else {
+      throw new ForbiddenException()
+    }
+  }
+
+  @ApiOperation({
+    title: '프로젝트 항목 수정하기',
+  })
+  @ApiResponse({
+    description: '프로젝트',
+    status: 200,
+    type: ProjectPayload,
+  })
+  @ApiResponse({
+    status: 403,
+    description: '접근할 수 없는 프로젝트',
+  })
+  @Patch('projects/:projectId')
+  async updateProjectById(
+    @Param('projectId') projectIdStr: string,
+    @Body() payload: UpdateProjectPayload,
+    @Req() req,
+  ) {
+    const projectId = parseInt(projectIdStr, 10)
+    if (await this.repo.authorizeProject(req.user.id, projectId)) {
+      return this.repo.updateProjectFrom(payload, projectId)
     } else {
       throw new ForbiddenException()
     }
@@ -206,6 +234,33 @@ export class TodoController {
     const todoId = parseInt(todoIdStr, 10)
     if (this.repo.authorizeTodo(req.user.id, todoId)) {
       return this.repo.findTodoById(todoId)
+    } else {
+      // TODO: ForbiddenException 테스트
+      throw new ForbiddenException()
+    }
+  }
+
+  @ApiOperation({
+    title: '할 일 항목 수정하기',
+  })
+  @ApiResponse({
+    description: '할 일',
+    status: 200,
+    type: TodoPayload,
+  })
+  @ApiResponse({
+    status: 403,
+    description: '접근할 수 없는 할 일',
+  })
+  @Patch('todos/:todoId')
+  updateTodoById(
+    @Param('todoId') todoIdStr: string,
+    @Body() payload: UpdateTodoPayload,
+    @Req() req,
+  ) {
+    const todoId = parseInt(todoIdStr, 10)
+    if (this.repo.authorizeTodo(req.user.id, todoId)) {
+      return this.repo.updateTodoFrom(payload, todoId)
     } else {
       // TODO: ForbiddenException 테스트
       throw new ForbiddenException()

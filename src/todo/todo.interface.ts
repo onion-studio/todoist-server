@@ -11,6 +11,20 @@ export class NewTodoPayload implements Pick<Todo, 'title'> {
   readonly title: string
 }
 
+export class UpdateTodoPayload implements Pick<Todo, 'title' | 'complete'> {
+  @ApiModelProperty({
+    description: '할 일 제목',
+    example: '할 일 제목',
+  })
+  readonly title: string
+
+  @ApiModelProperty({
+    description: '완료 여부',
+    example: false,
+  })
+  readonly complete: boolean
+}
+
 export class UpdateTodosOrderItem implements Pick<Todo, 'id' | 'order'> {
   @ApiModelProperty({
     description: 'ID',
@@ -42,7 +56,15 @@ export class NewProjectPayload implements Pick<Project, 'title'> {
   readonly title: string
 }
 
-export class TodoPayload implements Pick<Todo, 'title' | 'id'> {
+export class UpdateProjectPayload implements Pick<Project, 'title'> {
+  @ApiModelProperty({
+    description: '프로젝트 제목',
+    example: '프로젝트 제목',
+  })
+  readonly title: string
+}
+
+export class TodoPayload implements Pick<Todo, 'title' | 'id' | 'complete'> {
   @ApiModelProperty({
     description: 'ID',
     example: 1,
@@ -54,6 +76,12 @@ export class TodoPayload implements Pick<Todo, 'title' | 'id'> {
     example: '할 일 제목',
   })
   readonly title: string
+
+  @ApiModelProperty({
+    description: '완료 여부',
+    example: false,
+  })
+  readonly complete: boolean
 }
 
 export class ProjectPayload implements Pick<Project, 'id' | 'title'> {

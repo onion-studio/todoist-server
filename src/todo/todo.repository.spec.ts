@@ -122,4 +122,20 @@ describe('TodoRepository', () => {
       }),
     )
   })
+
+  describe('updateTodoFrom', () => {
+    test(
+      'works',
+      withTx(async m => {
+        const { todo1 } = await basicFixture(m)
+        const repo = m.getCustomRepository(TodoRepository)
+        const updated = await repo.updateTodoFrom(
+          { complete: true, title: 'new title' },
+          todo1.id,
+        )
+        expect(updated.title).toBe('new title')
+        expect(updated.complete).toBe(true)
+      }),
+    )
+  })
 })
