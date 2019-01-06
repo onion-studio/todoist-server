@@ -6,16 +6,8 @@ services:
       - "3030:3000"
     links:
       - db
-    environment:
-      TYPEORM_CONNECTION: mysql
-      TYPEORM_HOST: db
-      TYPEORM_USERNAME: todoist
-      TYPEORM_PASSWORD: todoist
-      TYPEORM_DATABASE: todoist
-      TYPEORM_PORT: 3306
-      TYPEORM_ENTITIES: src/entity/*.ts
-      TYPEORM_MIGRATIONS: migration/**/*.ts
-      TYPEORM_MIGRATIONS_RUN: 'true'
+    volumes:
+      - ./docker.ormconfig.json:/usr/src/app/ormconfig.json
   db:
     image: mysql:5
     command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci

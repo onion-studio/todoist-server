@@ -1,0 +1,12 @@
+{
+  "type": "mysql",
+  "entities": ["src/entity/*.ts"],
+  "migrations": ["migration/**/*.ts"],
+  "charset": "utf8mb4",
+  "host": "db",
+  "username": "todoist",
+  "password": "todoist",
+  "database": "todoist",
+  "port": 3306,
+  "migrationsRun": true
+}
